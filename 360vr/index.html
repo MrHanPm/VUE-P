@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>卡车之家全景看车</title>
+	<style type="text/css">
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+        html body,#container{
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            z-index: -1;
+            overflow: hidden;
+            -ms-touch-action: none;
+            background: #000;
+        }
+        #container{z-index: 1;}
+        #lodImg{display: none;}
+        /* loading */
+        .loading{
+            display: none;
+            position: absolute;
+            width: 160px;
+            height: 140px;
+            -webkit-transition:opacity .5s ease-in;
+			-moz-transition:opacity .5s ease-in;
+			transition:opacity .5s ease-in;
+            left: 50%;
+            top: 50%;
+            z-index: 100;
+            margin: -70px 0 0 -80px;
+            -webkit-border-radius: 8px;
+            border-radius: 8px;
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAMAAACfWMssAAAAn1BMVEUAAAD+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/Pz+/PwOtztYAAAANHRSTlMABgL49eLGdEU6/O3UfRjyaTcNCequpYZuXllULScjHxQR3di/tIqATOfPu5ZjQJyPMS/JoJ5HdQAAAdZJREFUSMftlNluo0AQRZt9CZsN2AaMgYDxvmXq/79tBNYYRpNbE16jnAcQag4t6laX+GHMeiO+yDWXxYCsB2JgznjJwnXTYZeMsmHtsceep5J/iA6Na4Xdo+SQ9VqT4gSLBv2hvl1mVUBq8Vpz7SX0pJrGaCpF10o8mSmOBcU9/YOtne7pupx7Di1CKG7pc5TDu0Zk4NAUYlBzKN6h5B+bGJemjKC4NU3LgvkHBAmKjVdJKIsj9BS2Y02COBInxlhccF6uYnHFiUvCWIw317DnV4x4wSXVA8aTdaBFyZotqQX3ywTLAv/gmvMKnyC/QkZ0iWGJvfCdE5UHFFMovXUXHda1Qd4p+7tVzVk19mY28DQv727DIN5pW+Nj+Az6Q3Umbp0+H7agYWaFOziikmcjtqPD7rzEq87EYD79UW1aIrefT3cbDyhZpG17i8+VPCqHSvWlkFMmP6f8dDCduowaH3sRaNHEIRbVhF2WLfQaenYqGLyljacThxQjzxAsGxCh6gqe65FGKFGtx+ddsLc24j9kvXjQt/3reRmKL7LqI9mJqchu3zfnyeLc0PqzOln0DJ+G0zaBwujztz8miyvqMaeKXks9q9yTJxXVbN56Vo9SFt+O36/s2KYFeZNdAAAAAElFTkSuQmCC) no-repeat 50% 50%;
+        }
+        .loading.visible{
+            display: block;
+        }
+        .loading-ring{
+            display: block;
+            position: absolute;
+            width: 96px;
+            height: 96px;
+            left: 50%;
+            top: 50%;
+            margin: -48px 0 0 -48px;
+            -webkit-animation: loaing-animation linear 1s infinite;
+            animation: loaing-animation linear 1s infinite;
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAMAAADVRocKAAAAsVBMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+3mHKcAAAAO3RSTlMABAgSCvbyDhkhHfruFivqwUrHNC/m2kE8OOLQvGVS3rKVRdUoqJpgW1Yly4tuaq2CopB0nk+3eXGGfW4mwkUAAAVASURBVGjetdnpdqJAEAXgYlEWBQFRQEUBF8R9jZr3f7DpribM6BiD2rlz5s+cOfVRt5KcJEC5yJJu+r597NPYXmCqigC8IqqjwEtsOj2bTtMwXC3PyzDNEtMQeEx3g8D3GJBl05QBe/LnvFyuMleEdyJpbrMZ+AUwpcCKAqfT5+ZyWex28ar5+viZ6eZAkthHBoQ58EmABQUmk40vvPb0oxEFsKGbE+wJsEEgJsBhG9tPE7KuzUam6TYLwG+a2mxmGORfAzv9BzgctuPxzoVnIhi6VgC+H5iq+N+CbnYiDeECBFhHe+mJx1d1BPAETV2Gb2LYmxxYr6No7ZduX6XADAFNgYcZhV/Ax0dvKZSqRzIIwBrSS3yUq+FhnAO9iV5qvpE3pAslN16SE1DAsiLz5/lkAQQ0GUrHjAnQI4BjBfAwovQFSPBMhCwHHMd++P+UL0CEJ+OOGTCfJ4/mE8AgwCtfJpULAcj87jz4dr6cAxK8EuGEC3S7zneXlmXWkAIvZkWAbnc4dNT7B84BGV5OyoD2WLi3oYgNSTK8kSUD2vt78xmgPO6ZBB7lwoCBd28BCijwXoRDl84fOPJ/89kJ4N1IFgKdy31AgLcTMKBjXs9nJxCBQ1YE6HRakXAN4AmAR4QeAq3j7QIyr2/WmgMEHOEWEIFTdhRoNPp/57MTAK+o7U6LANYNIAK3LBCoBwWANwZ+0RgQFwDPBTAxAer1lvJvQwJPwKcL1KvZvwDwjDBHYF0AuADPnBBoiH9PAHwzQqBqFwCh+KZL51c3OP9XgAkFKr0CEHgDUwTqAkj9rG/7LvCOjkBlBl7Pig6XPnBPp0qBPiwrtfrACfkDEZ1f2cOlVqtUG1P+QIxADNsaESoJf+BEgdoYenR+xeUPpAj0wEFA5Q8cEbCgS4Gqcv2ligeQ0BPUHBj+FuDRBcgG7d8FetAh838FOCLwAS26QPUXjjytUGAMHQRM/kCIQAxdBH7jE43Or22gV6FAyh/YNapECOGAwIY/sHAGjVrtCCc6v7rmD6w2h8iyRmBToN4G3hGbQXLMMhE0BOoj3oAgivkPjAMEUu4bFMC2SoEDb0CmANCEdH6jLXBu6C+gI9BIODckY0MYB4EJ94YKYI/AQOLdUAHMKNBqhVwXQADyRPUGAeYCzwXYCfJkCHSmvBcQCq+LgCVwW0BBAIosCdDpDFJ+C9wA8rBFgaEBXCIqtwCsEGgv+AAKAa7ng+Ag0Pa5FKRcnwATtDoDAlgGh4Ik1hBcJ0ZguIV3I0gMgJuoQwS653cBSWIngNvYdP6w2+2/92tNCYG7P7RuGDBP3nt+Btz9zW/EACt4Y74h4Qnub6k7CDhW8vJ8lQEi3I87J/PnjmP14aUYqmFgQ/BdgjkFLAvfVz0bQVUZIMP3sUlDFOjFKjwZRddV1tDDh0scBnys/Sfr0RDA+Q/TtBgQRZsnllA0LQcU+CmjiAAfBFiPMxlKRdRGMwTICcosG/cosF6Px5N+CULWTBMBsoACpRLmwHZ7iLMfipJGrkvmz3ABEUqmOY5yYDKJT57yffXkbTABWEPPvHyTQzI/B3a7xd4eif+/Mnd93w8IkDekwFPRFgQ4HCZxvFssLpvN5z5NmqY5kwxShxl4tp14nh8UwAvvDv0FXaAATvv9ebkKw3Q6zfr9YwHQhkaqCK/E3dOGEPgkAJn/BRyPdpJ42BABdBFejTZdEOBCgFMOpAjgAgww86d/3bBXy+X5vD9jQxTICiBoagpwiDTz+2lInKsT+KauAL+Iku42Pc9LyF+f1F76jdsfJxyjfAMY5EsAAAAASUVORK5CYII=) no-repeat 0 0;
+        }
+        @-webkit-keyframes loaing-animation {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes loaing-animation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #msg{position: absolute; top: 50%; left: 50%; width: 110px; height: 30px; background-color: rgba(0,0,0,.5); border-radius: 20px;color: #fff; font-size: 14px; line-height: 30px;z-index: 999; margin-left: -52px; margin-top: -15px; text-align: center;-webkit-transition:opacity .5s ease-in;
+            -moz-transition:opacity .5s ease-in;
+            transition:opacity .5s ease-in; display: none;}
+    </style>
+	<script src="https://s.kcimg.cn/vr/js/three.min.js?2013"></script>
+	<script src="js/viewer.min.js"></script>
+	<!-- // <script src="https://s.kcimg.cn/vr/js/viewer.min.js?20179943"></script> -->
+	<script>
+		// var https = 'https://s.kcimg.cn/wap/font/vr/';
+		var httpsR = 'https://topic.360che.com/api/qjt/?infoid=';
+
+		function load() {
+            var xhr = new XMLHttpRequest();
+            var JSONS = '';
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState === 4){
+                    if(xhr.status == 200){
+                        JSONS = JSON.parse(xhr.responseText);
+                        // console.log(JSONS);
+                        if (JSONS.result === 1) {
+                            document.getElementById('lodImg').src = JSONS.data[0]['imgdata'][0]['img'];
+                            var div = document.getElementById('container'),
+                            PSV = new PhotoSphereViewer({
+                                panorama: JSONS.data[0]['imgdata'][0]['img'],
+                                container: div,
+                                default_position: {long: 4.4, lat: -1.57},
+                                time_anim: 100,
+                                navbar: true,
+                                long_offset: 0.003,
+                                lat_offset: 0.003,
+                                zoomRangeWidth: 10,
+                                loading_msg: ' ',
+                                // zoomRangeDisk: 7,
+                                lables: 'https://s.kcimg.cn/wap/font/vr/logonb.png',
+                                size: {
+                                    width: '100%',
+                                    height: '100%'
+                                },
+                                onready: isLoading()
+                            });
+                        }
+                    }
+                }
+            }
+            xhr.open('GET', getUrl(), true);
+            xhr.send();
+		}
+		// 根据参数名称获取值
+        function getQueryStringByName (name) {
+            var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)","i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
+        }
+        // 根据参数名称获取值
+        function getUrl () {
+            return httpsR + getQueryStringByName('infoid');
+        }
+        // 获取文件名
+        // function getFileName () {
+        //     return https + getQueryStringByName('s') +  '-' + getQueryStringByName('m') + '-' + getQueryStringByName('i') + '.jpg';
+        // }
+        function isLoading () {
+        	var v;
+        	if (document.getElementById('AutoButton')) {
+        		v = window.clearInterval(v);
+        		var t = setTimeout(function(){document.getElementById('loading').style.opacity = 0;noLoading();},300);
+        	} else {
+        		v = setInterval(function(){isLoading()},1000);
+        	}
+        }
+        function noLoading () {
+        	if (document.getElementById('loading').style.opacity === '0') {
+				var t = setTimeout(function(){document.getElementById('loading').style.display = 'none';},500);
+        	}
+        }
+	</script>
+</head>
+<body onload="load()">
+    <div id="msg" style="opacity:0;"></div>
+	<div class="loading visible" id="loading">
+	    <span class="loading-ring"></span>
+	</div>
+	<div id="container"></div>
+    <img id="lodImg" src=""/>
+</body>
+</html>
